@@ -36,8 +36,14 @@ public class Role implements Serializable {
 
     private LocalDateTime updateTime;
 
+    /**
+     * 角色名称
+     */
     private String name;
 
+    /**
+     * 0:未删除   1：已删除
+     */
     private Integer delFlag;
 
     private Boolean defaultRole;

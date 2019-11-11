@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
-import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
-import com.baomidou.mybatisplus.generator.config.GlobalConfig;
-import com.baomidou.mybatisplus.generator.config.PackageConfig;
-import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
+import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tututu
@@ -26,6 +28,8 @@ public class Generator {
     }
 
     public void generateCode(){
+
+        String projectPath = System.getProperty("user.dir");
         //1.全局配置
         GlobalConfig gc = new GlobalConfig();
         gc
@@ -36,6 +40,7 @@ public class Generator {
                 .setIdType(IdType.UUID)
                 .setServiceName("%sService")
                 .setBaseResultMap(true)
+                .setOpen(false)   //生产完之后是否打开生产文件所在目录  默认true
                 .setBaseColumnList(true);
 
         //2.数据源配置
@@ -54,7 +59,7 @@ public class Generator {
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setTablePrefix("t_")
                 .setRestControllerStyle(true)
-                .setInclude("t_user","t_role");
+                .setInclude("t_user,t_role".split(","));
 
 
         //4.包名策略配置
@@ -69,12 +74,31 @@ public class Generator {
 
 
         // 自定义配置
-        InjectionConfig ijc = new InjectionConfig() {
-            @Override
-            public void initMap() {
-                //to do noting
-            }
-        };
+//        InjectionConfig cfg = new InjectionConfig() {
+//            @Override
+//            public void initMap() {
+//                //to do noting
+//            }
+//        };
+//
+//        // 自定义输出配置
+//        List<FileOutConfig> focList = new ArrayList<>();
+//        focList.add(new FileOutConfig() {
+//            @Override
+//            public String outputFile(TableInfo tableInfo) {
+//                // 自定义输出文件名 ， 如果你 Entity 设置了前后缀、此处注意 xml 的名称会跟着发生变化！！
+//                return projectPath + "/src/main/java/" + pkConfig.getModuleName()+"/service/impl"
+//                        + "/" + tableInfo.getEntityName() + "ServiceImpl" + ".java";
+//            }
+//        });
+//
+//        cfg.setFileOutConfigList(focList);
+
+
+
+        TemplateConfig temConfig = new TemplateConfig();
+        temConfig.setServiceImpl("mytemplate/serviceImpl.java.vm");
+        temConfig.setXml(null);
 
         //5.整合配置
 
@@ -82,8 +106,10 @@ public class Generator {
         ag.setGlobalConfig(gc)
                 .setDataSource(dsCofnig)
                 .setStrategy(stConfig)
+                .setTemplate(temConfig)
+                .setTemplateEngine(new VelocityTemplateEngine())
+                //.setCfg(cfg)
                 .setPackageInfo(pkConfig);
         ag.execute();
-
     }
 }

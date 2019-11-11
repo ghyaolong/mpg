@@ -5,7 +5,6 @@ import com.yao.mpg.mapper.UserMapper;
 import com.yao.mpg.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-
 /**
  * <p>
  *  服务实现类
