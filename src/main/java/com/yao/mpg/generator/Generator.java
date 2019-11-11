@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
+import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
+import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 
@@ -39,6 +41,7 @@ public class Generator {
                 .setFileOverride(true)
                 .setIdType(IdType.UUID)
                 .setServiceName("%sService")
+                .setEntityName("%sPo")
                 .setBaseResultMap(true)
                 .setOpen(false)   //生产完之后是否打开生产文件所在目录  默认true
                 .setBaseColumnList(true);
@@ -49,7 +52,35 @@ public class Generator {
                 .setDriverName("com.mysql.jdbc.Driver")
                 .setUrl("jdbc:mysql://localhost:3306/cube_mall")
                 .setUsername("root")
-                .setPassword("root");
+                .setPassword("root")
+                .setTypeConvert((x,y) -> {
+                        String t = y.toUpperCase();
+                        if (t.contains("CHAR")) {
+                            return DbColumnType.STRING;
+                        } else if (t.contains("DATE") || t.contains("TIMESTAMP")||t.contains("DATETIME")) {
+                            return DbColumnType.DATE;
+                        } else if (t.contains("NUMBER")) {
+                            if (t.matches("NUMBER\\(+\\d\\)")) {
+                                return DbColumnType.INTEGER;
+                            } else if (t.matches("NUMBER\\(+\\d{2}+\\)")) {
+                                return DbColumnType.LONG;
+                            }
+                            return DbColumnType.INTEGER;
+                        } else if (t.contains("FLOAT")) {
+                            return DbColumnType.FLOAT;
+                        } else if (t.contains("clob")) {
+                            return DbColumnType.CLOB;
+                        } else if (t.contains("BLOB")) {
+                            return DbColumnType.OBJECT;
+                        } else if (t.contains("binary")) {
+                            return DbColumnType.BYTE_ARRAY;
+                        } else if (t.contains("RAW")) {
+                            return DbColumnType.BYTE_ARRAY;
+                        }
+                        return DbColumnType.STRING;
+
+                })
+        ;
 
         //3.策略配置
 
@@ -57,7 +88,7 @@ public class Generator {
         stConfig.setCapitalMode(true)
                 .setEntityLombokModel(true)
                 .setNaming(NamingStrategy.underline_to_camel)
-                .setTablePrefix("t_")
+                //.setTablePrefix("t_")
                 .setRestControllerStyle(true)
                 .setInclude("t_user,t_role".split(","));
 
